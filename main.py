@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from flask import jsonify
 from enum import Enum
 #uvicorn main:app --reload
-
+#https://fastapi.tiangolo.com/pt/tutorial/path-params/
 app = FastAPI(debug=1)
 
 @app.get("/buscar_usuario/{id}",
