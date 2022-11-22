@@ -1,3 +1,6 @@
 mysql-connector-python
 flask
 flask_pydantic_spec
+
+fastapi
+"uvicorn[standard]"
