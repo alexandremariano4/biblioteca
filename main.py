@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Body, Request
 from pydantic import BaseModel
 from enum import Enum
+from usuario.cadastrar_usuario import CadastrarUsuario
+from usuario.alterar_usuario import AlterarUsuario
+from httpx import get
+
 #uvicorn main:app --reload
 #https://fastapi.tiangolo.com/pt/tutorial/query-params-str-validations/
 app = FastAPI(title='Biblioteca',
@@ -11,30 +15,47 @@ class Sexo(str,Enum):
     M = 'M'
     F = 'F'
 class Usuario(BaseModel):
-    name: str  = Query(max_length=15,default='Alexandre Teste')
+    nome: str  = Query(max_length=30,default='Alexandre Teste')
     cpf: str = Query(max_length=11,default='12345678901')
-    sexo : Sexo = Query(default='M')
+    sexo : Sexo = Query(default='M',max_length=1)
     telefone: str = Query(max_length=11,default='31973928607')
-    endereço: str = Query(max_length=25,default='Rua Bão Sernado, 15')
+    cep: str = Query(max_length=8,default='30855184')
 
 
-@app.post('/usuarios/',tags=['Usuário'],summary='<Cadastra um novo usuário na base de dados>',
+@app.post('/usuarios/',
+        tags=['Usuário'],
+        summary='<Cadastra um novo usuário na base de dados>',
         description='Cadastra um único usuário no sistema',
-        status_code=201)
+        status_code=201
+        )
 async def cadastra_usuario(usuario: Usuario):
-
-    usuario_dados = usuario,
+    novo_usuario = CadastrarUsuario(usuario)
+    usuario_dados = novo_usuario.cadastro_usuario()
     return usuario_dados
+
+@app.put('/usuarios/',
+        tags=['Usuário'],
+        summary='<Atualiza um usuário específico na base de dados>',
+        description='Atualiza um único usuário do sistema',
+        status_code=201
+        )
+async def atualiza_usuario(usuario: Usuario):
+    antigo_usuario = AlterarUsuario(usuario)
+    novo_usuario = antigo_usuario.alterar_usuario()
+    return novo_usuario
+    
 
 
 @app.get("/usuarios/{id}",
-        tags=['Usuário'],description='Busca somente um usuário do sistema a partir do ID informado',summary='<Busca um usuário específico na base a partir do ID>',
+        tags=['Usuário'],
+        description='Busca somente um usuário do sistema a partir do ID informado',summary='<Busca um usuário específico na base a partir do ID>',
         response_description="Retorna somente um usuário filtrado pelo ID em um objeto",
-        status_code=200)
+        status_code=200
+        )
 async def buscar_usuario(id:str):
-    name = 'Alexandre'
+    nome = 'Alexandre'
     cpf = '126.395.806-04'
-    response = {'id': id,'name':name,'cpf':cpf}
+    response = {'id': id,'name':nome,'cpf':cpf}
     return response
 
 
