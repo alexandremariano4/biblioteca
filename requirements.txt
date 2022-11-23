@@ -3,4 +3,4 @@ flask
 flask_pydantic_spec
 
 fastapi
-"uvicorn[standard]"
+uvicorn[standard]
