@@ -1,6 +1,8 @@
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Response , status, Query
 from pydantic import BaseModel
 from enum import Enum
+from usuario.cadastrar import cadastrar
+
 #uvicorn main:app --reload
 #https://fastapi.tiangolo.com/pt/tutorial/query-params-str-validations/
 app = FastAPI(title='Biblioteca',
@@ -11,20 +13,32 @@ class Sexo(str,Enum):
     M = 'M'
     F = 'F'
 class Usuario(BaseModel):
-    name: str  = Query(max_length=15,default='Alexandre Teste')
-    cpf: str = Query(max_length=11,default='12345678901')
-    sexo : Sexo = Query(default='M')
-    telefone: str = Query(max_length=11,default='31973928607')
-    endereço: str = Query(max_length=25,default='Rua Bão Sernado, 15')
+    nome: str  = Query(max_length=40)
+    cpf: str = Query(max_length=11)
+    sexo : Sexo = Query(max_length=1)
+    telefone: str = Query(max_length=11)
+    endereco: str = Query(max_length=25)
 
 
 @app.post('/usuarios/',tags=['Usuário'],summary='<Cadastra um novo usuário na base de dados>',
-        description='Cadastra um único usuário no sistema',
-        status_code=201)
-async def cadastra_usuario(usuario: Usuario):
+        description='Cadastra um único usuário no sistema',status_code=201)
+async def cadastra_usuario(usuario: Usuario, response: Response):
+    retorno = cadastrar(usuario)
+    sts = {
+        False: status.HTTP_201_CREATED,
+        True: status.HTTP_409_CONFLICT
+        }
+    response.status_code = sts[retorno['has_error']]
+    return retorno
 
+
+@app.put('/usuarios/',tags=['Usuário'],summary='<Altera um usuário existente na base de dados>',
+        description='Atualiza a informação de um usuário na base de dados',
+        status_code=201)
+async def altera_usuario(usuario: Usuario):
     usuario_dados = usuario,
     return usuario_dados
+
 
 
 @app.get("/usuarios/{id}",
@@ -67,10 +81,17 @@ async def buscar_livro(categoria: Categoria):
         return {'name': 'Livro Teste de Drama','Páginas': '526'}
     return 'Nenhum valor válido escolhido'
     
+    
+
+@app.delete("/Livros/{id}",tags=['Livros'],summary='<Deleta um Livro da Base de dados>',status_code=204)
+async def read_item(id):
+    return {"id": id}
 
 
-@app.get("/items/{item_id}",tags=['Exemplos Uteis'],summary='<Exemplo de parâmetro de rota (item_id) e exemplo de parâmetro de consulta (q)>')
-async def read_item(item_id: str, q: str or None = None):
-    if q:
-        return {"item_id": item_id, "q": q}
-    return {"item_id": item_id}
+
+# @app.get("/items/{item_id}",tags=['Exemplos Uteis'],summary='<Exemplo de parâmetro de rota (item_id) e exemplo de parâmetro de consulta (q)>')
+# async def read_item(item_id: str, q: str or None = None):
+#     if q:
+#         return {"item_id": item_id, "q": q}
+#     return {"item_id": item_id}
+
