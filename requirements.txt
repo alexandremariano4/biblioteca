@@ -1,6 +1,7 @@
 mysql-connector-python
 flask
 flask_pydantic_spec
-
+httpx
+mysql-connector-python
 fastapi
 uvicorn[standard]

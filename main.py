@@ -13,11 +13,11 @@ class Sexo(str,Enum):
     M = 'M'
     F = 'F'
 class Usuario(BaseModel):
-    nome: str  = Query(max_length=40)
-    cpf: str = Query(max_length=11)
-    sexo : Sexo = Query(max_length=1)
-    telefone: str = Query(max_length=11)
-    endereco: str = Query(max_length=25)
+    nome: str  = Query(max_length=40,default='João da Silva')
+    cpf: str = Query(max_length=11,default='12345678901')
+    sexo : Sexo = Query(max_length=1,default='M')
+    telefone: str = Query(max_length=11,default='31912345678')
+    endereco: str = Query(max_length=25,default='Rua Bão Sernardo')
 
 
 @app.post('/usuarios/',tags=['Usuário'],summary='<Cadastra um novo usuário na base de dados>',
@@ -39,16 +39,16 @@ async def altera_usuario(usuario: Usuario):
     usuario_dados = usuario,
     return usuario_dados
 
-
-
 @app.get("/usuarios/{id}",
-        tags=['Usuário'],description='Busca somente um usuário do sistema a partir do ID informado',summary='<Busca um usuário específico na base a partir do ID>',
+        tags=['Usuário'],
+        description='Busca somente um usuário do sistema a partir do ID informado',summary='<Busca um usuário específico na base a partir do ID>',
         response_description="Retorna somente um usuário filtrado pelo ID em um objeto",
-        status_code=200)
+        status_code=200
+        )
 async def buscar_usuario(id:str):
-    name = 'Alexandre'
+    nome = 'Alexandre'
     cpf = '126.395.806-04'
-    response = {'id': id,'name':name,'cpf':cpf}
+    response = {'id': id,'name':nome,'cpf':cpf}
     return response
 
 
